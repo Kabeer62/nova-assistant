@@ -2,5 +2,4 @@ services:
   - type: web
     name: nova-assistant
     env: python
-    buildCommand: ""
     startCommand: python app.py
