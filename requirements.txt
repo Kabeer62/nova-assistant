@@ -35,7 +35,6 @@ optree==0.14.1
 packaging==24.2
 protobuf==5.29.4
 psutil==7.0.0
-PyAudio==0.2.14
 PyAutoGUI==0.9.54
 pydantic==2.11.1
 pydantic_core==2.33.0
