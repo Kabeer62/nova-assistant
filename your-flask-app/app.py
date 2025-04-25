@@ -1,22 +1,21 @@
 from flask import Flask, render_template, request, jsonify
-import subprocess
+from nova_core import get_nova_response  # This is your new core logic handler
 
 app = Flask(__name__)
 
-# Home route - serves the HTML frontend
+# Home route - serves the chat HTML frontend
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Route to start the Nova assistant when button is clicked
-@app.route('/start-nova', methods=['POST'])
-def start_nova():
-    try:
-        subprocess.Popen(['python', 'main.py'])  # Make sure main.py runs Nova
-        return jsonify({"status": "success", "message": "Nova assistant started."})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+# Route to handle chat POST requests
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_input = request.json.get("message")
+    if user_input:
+        response = get_nova_response(user_input)
+        return jsonify({"response": response})
+    return jsonify({"response": "No input received."})
 
 if __name__ == '__main__':
-    # Use host='0.0.0.0' if Safari still blocks localhost (or use 'localhost')
-    app.run(debug=True, host='localhost', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
