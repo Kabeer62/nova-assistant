@@ -42,7 +42,7 @@ pydantic_core==2.33.0
 PyGetWindow==0.0.9
 Pygments==2.19.1
 PyMsgBox==1.0.9
-pyobjc==11.0
+pyobjc==11.0; sys_platform == "darwin"
 pyobjc-core==11.0
 pyobjc-framework-Accessibility==11.0
 pyobjc-framework-Accounts==11.0
