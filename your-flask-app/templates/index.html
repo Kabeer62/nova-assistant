@@ -13,15 +13,25 @@
   </div>
 
   <script>
-    document.getElementById("startBtn").addEventListener("click", () => {
-      fetch("/start-nova", {
-        method: "POST"
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value;
+      if (!message.trim()) return;
+
+      const chatLog = document.getElementById("chatLog");
+      chatLog.innerHTML += `<div class="message user"><strong>You:</strong> ${message}</div>`;
+      input.value = "";
+
+      fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: message })
       })
       .then(res => res.json())
       .then(data => {
-        document.getElementById("statusMsg").textContent = data.message;
+        chatLog.innerHTML += `<div class="message nova"><strong>Nova:</strong> ${data.response}</div>`;
       });
-    });
+    }
   </script>
 </body>
 </html>
