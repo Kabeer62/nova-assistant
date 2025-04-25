@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nova Assistant</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1><span class="hello">Enter the</span> <span class="nova">Nova Core</span>!</h1>
+    <p>This is the Flask frontend interface.</p>
+    <button id="startBtn">Start Assistant</button>
+    <p id="statusMsg"></p>
+  </div>
+
+  <script>
+    document.getElementById("startBtn").addEventListener("click", () => {
+      fetch("/start-nova", {
+        method: "POST"
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("statusMsg").textContent = data.message;
+      });
+    });
+  </script>
+</body>
+</html>
