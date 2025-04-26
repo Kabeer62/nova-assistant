@@ -13,25 +13,33 @@
   </div>
 
   <script>
-    function sendMessage() {
-      const input = document.getElementById("userInput");
-      const message = input.value;
-      if (!message.trim()) return;
+    function startRecognition() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
+    recognition.start();
 
-      const chatLog = document.getElementById("chatLog");
-      chatLog.innerHTML += `<div class="message user"><strong>You:</strong> ${message}</div>`;
-      input.value = "";
-
-      fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: message })
-      })
-      .then(res => res.json())
-      .then(data => {
-        chatLog.innerHTML += `<div class="message nova"><strong>Nova:</strong> ${data.response}</div>`;
-      });
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('textOutput').innerText = transcript;
+        
+        // Send the transcript to your Flask server
+        fetch('/process', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: transcript }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Nova says:', data.reply);
+            // You can also use Web Speech API to speak the reply
+            const synth = window.speechSynthesis;
+            const utterThis = new SpeechSynthesisUtterance(data.reply);
+            synth.speak(utterThis);
+        });
     }
+}
   </script>
 </body>
 </html>
