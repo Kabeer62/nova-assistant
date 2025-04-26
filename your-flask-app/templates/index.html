@@ -10,36 +10,49 @@
     <p>This is the Flask frontend interface.</p>
     <button id="startBtn">Start Assistant</button>
     <p id="statusMsg"></p>
+    <p id="textOutput"></p> <!-- Added this so transcript displays -->
+    <audio id="audioPlayer" controls style="display: none;"></audio> <!-- Audio player hidden initially -->
   </div>
 
   <script>
-    function startRecognition() {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';
-    recognition.start();
+    document.getElementById('startBtn').addEventListener('click', startRecognition);
 
-    recognition.onresult = function(event) {
+    function startRecognition() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.start();
+
+      recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
-        document.getElementById('textOutput').innerText = transcript;
+        document.getElementById('textOutput').innerText = "You said: " + transcript;
         
-        // Send the transcript to your Flask server
+        // Send the transcript to Flask server
         fetch('/process', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text: transcript }),
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: transcript }),
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Nova says:', data.reply);
-            // You can also use Web Speech API to speak the reply
-            const synth = window.speechSynthesis;
-            const utterThis = new SpeechSynthesisUtterance(data.reply);
-            synth.speak(utterThis);
+          console.log('Nova says:', data.reply);
+
+          // Play the returned audio file
+          const audioPlayer = document.getElementById('audioPlayer');
+          audioPlayer.src = '/' + data.audio; // Add "/" to match static folder route
+          audioPlayer.style.display = 'block';
+          audioPlayer.play();
+        })
+        .catch(error => {
+          console.error('Error communicating with server:', error);
         });
+      }
+
+      recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+      }
     }
-}
   </script>
 </body>
 </html>
