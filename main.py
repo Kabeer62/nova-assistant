@@ -6,7 +6,9 @@ import webbrowser
 import pyttsx3 # Converts text to voice (offline, unlike gTTS which needs internet).
 import speech_recognition as sr # Listens to user speech and converts it to text using Google Speech API.
 import pyautogui # GUI automation (not fully used here, but useful for interaction)
+from gtts import gTTS
 import os
+import uuid
 import psutil #Helps get system resource usage like battery, CPU.
 import json # Loads and parses .json files
 import pickle # Used to load saved tokenizer and label encoder (from training).
@@ -35,12 +37,11 @@ engine.setProperty('voice', voices[18].id)
 engine.setProperty('rate', 180)
 engine.setProperty('volume', 1.0)
 
-# ----Core Functions---- #
-# Speaks any text via your configured voice.
 def speak(text):
-    """Speaks the given text"""
-    engine.say(text)
-    engine.runAndWait()
+    tts = gTTS(text=text, lang='en')
+    filename = f"static/{uuid.uuid4().hex}.mp3"
+    tts.save(filename)
+    return filename
 
 # 
 def command():
