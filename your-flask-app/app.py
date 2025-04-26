@@ -1,21 +1,24 @@
-from flask import Flask, render_template, request, jsonify
-from nova_core import get_nova_response  # This is your new core logic handler
+from flask import Flask, request, jsonify
+import pyttsx3
 
 app = Flask(__name__)
 
-# Home route - serves the chat HTML frontend
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Initialize Nova's voice engine
+engine = pyttsx3.init()
 
-# Route to handle chat POST requests
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_input = request.json.get("message")
-    if user_input:
-        response = get_nova_response(user_input)
-        return jsonify({"response": response})
-    return jsonify({"response": "No input received."})
+@app.route('/process', methods=['POST'])
+def process():
+    data = request.get_json()
+    text = data['text']
+    print(f"User said: {text}")
+
+    # Nova's logic
+    if 'hello' in text.lower():
+        reply = "Hello! How can I help you?"
+    else:
+        reply = "I'm not sure what you mean."
+
+    return jsonify({'reply': reply})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run()
